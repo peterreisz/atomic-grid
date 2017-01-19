@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "angular": "^1.6.1",
+    "atomic-grid": "0.0.2",
     "bootstrap": "^3.3.7"
   },
   "devDependencies": {

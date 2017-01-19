@@ -1,4 +1,5 @@
 .idea
+*.iml
 src/**/*.js
 node_modules
 ng1.js

@@ -1,6 +1,5 @@
 var webpack = require('webpack');
 var path = require('path');
-var nodeExternals = require('webpack-node-externals');
 
 
 module.exports = {
@@ -17,7 +16,15 @@ module.exports = {
     resolve: {
       extensions: ['', '.webpack.js', '.web.js', '.ts', '.tsx', '.js']
     },
-    externals: [nodeExternals()],
+    externals: [
+      '@angular/common',
+      '@angular/core',
+      '@angular/http',
+      '@angular/platform-browser',
+      '@types/angular',
+      '@types/core-js',
+      'rxjs'
+    ],
     resolveLoader: {
       root: path.join(__dirname, 'node_modules')
     },
