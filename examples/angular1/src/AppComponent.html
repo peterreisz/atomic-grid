@@ -1,0 +1,43 @@
+<table class="table table-striped table-hover" at-grid="myGrid"
+       at-grid-data="$ctrl.data"
+       at-grid-multi-selection="$ctrl.multiSelection"
+
+       at-grid-url2="api/asdf"
+       at-grid-data-provider2="$ctrl.getPage(state, additionalParams)"
+       at-grid-additional-parameters="{a: 1}">
+  <tr>
+    <th at-grid-sort="a">a</th>
+    <th at-grid-sort="b">b</th>
+    <th at-grid-sort="c">c</th>
+    <th at-grid-sort="d">d</th>
+  </tr>
+  <tr ng-repeat="item in myGrid.items"
+      ng-click="myGrid.toggleItemSelection(item)"
+      ng-class="{'success': myGrid.isItemSelected(item)}">
+    <td>{{ item.a }}</td>
+    <td>{{ item.b }}</td>
+    <td>{{ item.c }}</td>
+    <td>{{ item.d }}</td>
+  </tr>
+</table>
+
+<label>
+  <input type="checkbox" ng-model="$ctrl.multiSelection"> Multi selection
+</label><br/>
+
+Selected items: {{ myGrid.selectedItems }}<br/>
+AllSelection: {{ myGrid.isItemSelected() }}<br/>
+Page: {{ myGrid.page }}<br/>
+TotalPages: {{ myGrid.totalPages }}<br/>
+Start: {{ myGrid.pageStart }}<br/>
+End: {{ myGrid.pageEnd }}<br/>
+TotalElements: {{ myGrid.totalElements }}<br/>
+Size:
+<select ng-model="myGrid.size" ng-options="size for size in myGrid.pageSizes"></select><br/>
+
+<button class="btn btn-default" ng-click="myGrid.toggleItemSelection()">Toggle all selection</button>
+<button class="btn btn-default" ng-click="myGrid.search(true)">Search</button>
+<button class="btn btn-default" ng-disabled="!myGrid.isPrevEnabled" ng-click="myGrid.first()">First</button>
+<button class="btn btn-default" ng-disabled="!myGrid.isPrevEnabled" ng-click="myGrid.prev()">Prev</button>
+<button class="btn btn-default" ng-disabled="!myGrid.isNextEnabled" ng-click="myGrid.next()">Next</button>
+<button class="btn btn-default" ng-disabled="!myGrid.isNextEnabled" ng-click="myGrid.last()">Last</button>

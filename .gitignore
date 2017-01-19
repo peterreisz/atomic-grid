@@ -1,0 +1,6 @@
+.idea
+src/**/*.js
+node_modules
+ng1.js
+ng2.js
+atomic-grid-*.tgz

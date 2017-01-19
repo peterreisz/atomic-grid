@@ -1,0 +1,32 @@
+<table class="table table-striped table-hover"
+       #myGrid="atGrid" [atGridData]="data"
+        [atGridAdditionalParameters]="{a: 1}">
+  <tr>
+    <th atGridSort="a">a</th>
+    <th atGridSort="b">b</th>
+    <th atGridSort="c">c</th>
+    <th atGridSort="d">d</th>
+  </tr>
+  <tr *ngFor="let item of myGrid.items">
+    <td>{{ item.a }}</td>
+    <td>{{ item.b }}</td>
+    <td>{{ item.c }}</td>
+    <td>{{ item.d }}</td>
+  </tr>
+</table>
+
+Page: {{ myGrid.page }}<br/>
+TotalPages: {{ myGrid.totalPages }}<br/>
+Start: {{ myGrid.pageStart }}<br/>
+End: {{ myGrid.pageEnd }}<br/>
+TotalElements: {{ myGrid.totalElements }}<br/>
+Size:
+<select [(ngModel)]="myGrid.size">
+  <option *ngFor="let size of myGrid.pageSizes" [value]="size">{{ size }}</option>
+</select><br/>
+
+<button class="btn btn-default" (click)="myGrid.search(true)">Search</button>
+<button class="btn btn-default" [disabled]="!myGrid.isPrevEnabled" (click)="myGrid.first()">First</button>
+<button class="btn btn-default" [disabled]="!myGrid.isPrevEnabled" (click)="myGrid.prev()">Prev</button>
+<button class="btn btn-default" [disabled]="!myGrid.isNextEnabled" (click)="myGrid.next()">Next</button>
+<button class="btn btn-default" [disabled]="!myGrid.isNextEnabled" (click)="myGrid.last()">Last</button>
