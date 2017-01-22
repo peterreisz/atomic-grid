@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-import { Directive, Input, OnInit } from '@angular/core';
+import { Directive, Input, OnInit, Inject } from '@angular/core';
 import { Http } from '@angular/http';
 import { AtomicGridController } from '../core/atomic-grid.controller';
 import { AtomicGridNg2InMemoryDataProvider } from './atomic-grid.ng2.inmemory-data-provider.class';
@@ -18,7 +18,7 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
   @Input('atGridDataProvider') dataProvider;
   @Input('atGridAdditionalParameters') additionalParameters;
 
-  constructor(private http: Http) {
+  constructor(@Inject(Http) private http: Http) {
     super();
   }
 

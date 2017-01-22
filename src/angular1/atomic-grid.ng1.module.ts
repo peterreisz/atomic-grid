@@ -20,7 +20,7 @@ var sortDirective = {
   template: AtomicGridNg1SortController.template
 };
 
-function AtomicGridNg1Module(angular: ng.IAngularStatic) {
+function AtomicGridNg1ModuleFactory(angular: ng.IAngularStatic) {
   return angular
     .module('atomic-grid', [])
     .directive('atGrid', () => {
@@ -41,4 +41,4 @@ function AtomicGridNg1Module(angular: ng.IAngularStatic) {
     .name
 }
 
-export { AtomicGridNg1Module, AtomicGridNg1Controller, AtomicGridNg1SortController, AtomicGridNg1InMemoryDataProvider, AtomicGridNg1SpringDataProvider };
+export { AtomicGridNg1ModuleFactory, AtomicGridNg1Controller, AtomicGridNg1SortController, AtomicGridNg1InMemoryDataProvider, AtomicGridNg1SpringDataProvider };

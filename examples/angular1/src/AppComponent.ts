@@ -1,6 +1,8 @@
-import { AtomicGridNg1InMemoryDataProvider } from 'atomic-grid/ng1';
+import { AtomicGridNg1InMemoryDataProvider } from 'atomic-grid/dist/ng1';
 
 export default class AppComponent {
+
+  static $inject = [ '$q' ];
   
   data = [];
   provider;

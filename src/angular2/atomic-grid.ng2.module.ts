@@ -19,10 +19,10 @@ import { AtomicGridNg2SortController } from './atomic-grid.ng2.sort.controller';
   ]
 })
 export class AtomicGridNg2Module {
-  static forRoot(): ModuleWithProviders {
+  static forRoot(configuredProviders: Array<any>): ModuleWithProviders {
     return {
       ngModule: AtomicGridNg2Module,
-      providers: []
+      providers: configuredProviders
     };
   }
 }

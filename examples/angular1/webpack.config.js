@@ -67,7 +67,7 @@ module.exports = {
             browsers: ['last 3 version']
         })
     ],
-    devtool: 'eval',
+    devtool: argv.prod ? undefined : 'eval',
     devServer: {
         proxy: {
             '/api/*': 'http://localhost:8080'

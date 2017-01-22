@@ -1,7 +1,9 @@
 .idea
 *.iml
 src/**/*.js
+src/**/*.ngfactory.ts
+src/**/*.js.map
+src/**/*.json
 node_modules
-ng1.js
-ng2.js
 atomic-grid-*.tgz
+dist

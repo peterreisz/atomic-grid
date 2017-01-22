@@ -5,6 +5,8 @@ import { AtomicGridPage, AtomicGridState } from '../core/atomic-grid.types';
 
 export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
 
+  static $inject = [ '$q', '$attrs', '$http', '$scope', '$parse' ];
+
   private name: string;
 
   private data;

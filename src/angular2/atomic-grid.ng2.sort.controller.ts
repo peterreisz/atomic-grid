@@ -1,4 +1,4 @@
-import { Component, Input, Host, HostListener } from '@angular/core';
+import { Component, Input, Host, HostListener, Inject } from '@angular/core';
 import { AtomicGridNg2Controller } from './atomic-grid.ng2.controller';
 import { AtomicGridSort } from '../core/atomic-grid.types';
 
@@ -17,7 +17,7 @@ export class AtomicGridNg2SortController<T> {
 
   @Input('atGridSort') sort: string|Function;
 
-  constructor(@Host() private atGrid: AtomicGridNg2Controller<T>) { }
+  constructor(@Host() @Inject(AtomicGridNg2Controller) private atGrid: AtomicGridNg2Controller<T>) { }
 
   get sortBy(): AtomicGridSort {
     return this.atGrid.getSortBy(this.sort);

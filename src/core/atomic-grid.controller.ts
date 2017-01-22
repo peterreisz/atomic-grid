@@ -1,4 +1,4 @@
-import { AtomicGridPage, AtomicGridState, AtomicGridDataProvider } from './atomic-grid.types';
+import { AtomicGridPage, AtomicGridState, AtomicGridDataProvider, AtomicGridSort } from './atomic-grid.types';
 
 export abstract class AtomicGridController<T> {
 
@@ -152,7 +152,7 @@ export abstract class AtomicGridController<T> {
     this.search();
   }
 
-  getSortBy(sortBy: string|Function) {
+  getSortBy(sortBy: string|Function): AtomicGridSort {
     let item = this._state.sort.filter(item => item.sortBy == sortBy)[0];
     if (item && this._state.sort.length > 1) {
       item = {
@@ -182,7 +182,7 @@ export abstract class AtomicGridController<T> {
 
   protected _selectedItems: Array<T> = [];
 
-  get selectedItems() {
+  get selectedItems(): undefined | T | Array<T> {
     if (this._multiSelection) {
       return this._selectedItems;
     }

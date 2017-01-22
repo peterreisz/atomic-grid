@@ -3,6 +3,8 @@ import { AtomicGridSort } from '../core/atomic-grid.types';
 
 export class AtomicGridNg1SortController<T> {
 
+  static $inject = [ '$element' ];
+
   static template = `
     <span ng-transclude></span>
     

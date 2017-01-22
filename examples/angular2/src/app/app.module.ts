@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
-import { AtomicGridNg2Module } from 'atomic-grid/ng2';
+import { AtomicGridNg2Module } from 'atomic-grid/dist/ng2';
 
 @NgModule({
   declarations: [
@@ -14,7 +14,7 @@ import { AtomicGridNg2Module } from 'atomic-grid/ng2';
     BrowserModule,
     FormsModule,
     HttpModule,
-    AtomicGridNg2Module.forRoot()
+    AtomicGridNg2Module
   ],
   providers: [],
   bootstrap: [AppComponent]
