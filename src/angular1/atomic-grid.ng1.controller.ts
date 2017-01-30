@@ -23,13 +23,14 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
               private $scope: ng.IScope,
               private $parse: ng.IParseService) {
     super();
-
-    if (this.autoSearch === undefined) {
-      this.autoSearch = true;
-    }
   }
 
   $onInit() {
+    this.pagerRange = this.pagerRange || 2;
+    if (this.autoSearch === undefined) {
+      this.autoSearch = true;
+    }
+
     if (this.name) {
       this.$parse(this.name).assign(this.$scope, this);
     }

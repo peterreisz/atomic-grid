@@ -18,7 +18,6 @@ export abstract class AtomicGridController<T> {
 
   constructor() {
     this.resetState();
-    this.pagerRange = this.pagerRange || 2;
   }
 
   resetState() {
