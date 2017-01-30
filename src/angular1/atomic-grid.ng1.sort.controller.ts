@@ -8,9 +8,9 @@ export class AtomicGridNg1SortController<T> {
   static template = `
     <span ng-transclude></span>
     
-    <span class="glyphicon glyphicon-chevron-up" ng-show="$ctrl.sortBy.reverse === false"></span>
-    <span class="glyphicon glyphicon-chevron-down" ng-show="$ctrl.sortBy.reverse === true"></span>
-    <span class="badge">{{ $ctrl.sortBy.index }}</span>
+    <span class="glyphicon glyphicon-chevron-up" ng-show="$atGridSort.sortBy.reverse === false"></span>
+    <span class="glyphicon glyphicon-chevron-down" ng-show="$atGridSort.sortBy.reverse === true"></span>
+    <span class="badge">{{ $atGridSort.sortBy.index }}</span>
   `;
 
   private sort;

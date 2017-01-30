@@ -1,4 +1,4 @@
-import { AtomicGridPage, AtomicGridState, AtomicGridDataProvider, AtomicGridSort } from './atomic-grid.types';
+import { AtomicGridPage, AtomicGridState, AtomicGridDataProvider, AtomicGridSort, AtomicGridPagerItem } from './atomic-grid.types';
 
 export abstract class AtomicGridController<T> {
 
@@ -18,6 +18,7 @@ export abstract class AtomicGridController<T> {
 
   constructor() {
     this.resetState();
+    this.pagerRange = this.pagerRange || 2;
   }
 
   resetState() {
@@ -39,14 +40,19 @@ export abstract class AtomicGridController<T> {
     return this._loading;
   }
 
+  setPageData(page: AtomicGridPage<T>) {
+    this._page = page;
+    this.reCalculatePager()
+  }
+
   abstract search();
 
   get isPrevEnabled() {
-    return this.page > 1;
+    return !this.loading && this.page > 1;
   }
 
   get isNextEnabled() {
-    if (this._page) {
+    if (!this.loading && this._page) {
       return this._state.page < this.totalPages - 1;
     }
     return false;
@@ -93,6 +99,32 @@ export abstract class AtomicGridController<T> {
     if (this.isNextEnabled) {
       this.page = this.totalPages;
     }
+  }
+
+  protected pagerRange;
+  protected _pager: AtomicGridPagerItem[] = [];
+
+  protected reCalculatePager() {
+    let pages: AtomicGridPagerItem[] = [];
+
+    let min = Math.max( this._state.page - this.pagerRange + 1, 1 );
+    let max = Math.min( this._state.page + this.pagerRange + 1, this.totalPages );
+
+    for (let i = min; i <= max; i++) {
+      pages.push({
+        first: i == 1,
+        last: i == this.totalPages,
+        active: this._state.page + 1 == i,
+        number: i,
+        jump: () => this.page = i
+      });
+    }
+
+    this._pager = pages;
+  }
+
+  get pager() {
+    return this._pager;
   }
 
   get items() {
@@ -170,7 +202,7 @@ export abstract class AtomicGridController<T> {
   protected _multiSelection: boolean = false;
 
   set multiSelection(value) {
-    if (this._selectedItems.length > 1) {
+    if (this._selectedItems && this._selectedItems.length > 1) {
       this._selectedItems = [ this._selectedItems[0] ];
     }
     this._multiSelection = value;
@@ -182,11 +214,14 @@ export abstract class AtomicGridController<T> {
 
   protected _selectedItems: Array<T> = [];
 
-  get selectedItems(): undefined | T | Array<T> {
+  get selectedItems(): undefined | Array<T> {
     if (this._multiSelection) {
-      return this._selectedItems;
+      return this._selectedItems || [];
     }
-    if (this._selectedItems.length > 0) {
+  }
+
+  get selectedItem(): undefined | T {
+    if (!this._multiSelection && this._selectedItems && this._selectedItems.length > 0) {
       return this._selectedItems[0];
     }
   }

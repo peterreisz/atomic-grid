@@ -1,3 +1,5 @@
+import 'ts-helpers';
+
 export * from './core/atomic-grid.types';
 export * from './core/atomic-grid.controller';
 export * from './core/atomic-grid-inmemory-data-provider.class';

@@ -16,7 +16,7 @@ var sortDirective = {
     atGrid: '^atGrid'
   },
   controller: AtomicGridNg1SortController,
-  controllerAs: '$ctrl',
+  controllerAs: '$atGridSort',
   template: AtomicGridNg1SortController.template
 };
 
@@ -31,9 +31,12 @@ function AtomicGridNg1ModuleFactory(angular: ng.IAngularStatic) {
           url: '@atGridUrl',
           dataProvider: '&atGridDataProvider',
           additionalParameters: '&atGridAdditionalParameters',
-          multiSelection: '<atGridMultiSelection'
+          multiSelection: '<atGridMultiSelection',
+          pagerRange: '<atGridPagerRange',
+          autoSearch: '<atGridAutoSearch'
         },
-        controller: AtomicGridNg1Controller
+        controller: AtomicGridNg1Controller,
+        controllerAs: '$atGrid'
       }
     })
     .directive('atGridSort', () => sortDirective)

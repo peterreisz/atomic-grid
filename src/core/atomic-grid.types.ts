@@ -20,3 +20,11 @@ export interface AtomicGridPage<T> {
 export interface AtomicGridDataProvider<T> {
   getPage(state: AtomicGridState, additionalParams?: any): ng.IPromise<AtomicGridPage<T>> | Observable<AtomicGridPage<T>>;
 }
+
+export interface AtomicGridPagerItem {
+  first: boolean
+  last: boolean
+  active: boolean
+  number: number
+  jump: Function
+}

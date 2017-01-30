@@ -15,12 +15,18 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
 
   private additionalParameters;
 
+  private autoSearch;
+
   constructor(private $q: ng.IQService,
               private $attrs: ng.IAttributes,
               private $http: ng.IHttpService,
               private $scope: ng.IScope,
               private $parse: ng.IParseService) {
     super();
+
+    if (this.autoSearch === undefined) {
+      this.autoSearch = true;
+    }
   }
 
   $onInit() {
@@ -32,7 +38,10 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
     this.setRequestParameterProvider(
       () => this.additionalParameters({})
     );
-    this.search();
+
+    if (this.autoSearch) {
+      this.search();
+    }
   }
 
   setupDataProvider() {
@@ -82,12 +91,12 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
         this._loading = false;
       })
       .then(page => {
-        this._page = page;
+        this.setPageData(page);
       }, error => {
-        this._page = {
+        this.setPageData({
           totalElements: 0,
           content: []
-        };
+        });
       });
   }
 

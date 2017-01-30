@@ -1,6 +1,6 @@
 {
   "name": "atomic-grid",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Controller and data provider building blocks to create your own very special angular grid without writing any boilerplate code.",
   "scripts": {
     "ngc": "ngc",
@@ -12,6 +12,17 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/peterreisz/atomic-grid"
+  },
+  "bugs": {
+    "url": "https://github.com/peterreisz/atomic-grid/issues"
+  },
+  "homepage": "https://github.com/peterreisz/atomic-grid",
+  "dependencies": {
+    "ts-helpers": "^1.1.2"
+  },
   "devDependencies": {
     "@angular/common": "^2.4.4",
     "@angular/compiler": "^2.4.4",
@@ -23,7 +34,6 @@
     "rimraf": "^2.5.4",
     "rollup": "^0.41.4",
     "rxjs": "^5.0.3",
-    "ts-helpers": "^1.1.2",
     "typescript": "^2.1.5",
     "yargs": "^6.6.0"
   }
