@@ -1,11 +1,11 @@
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { Directive, Input, OnInit, Inject } from '@angular/core';
 import { Http } from '@angular/http';
 import { AtomicGridController } from '../core/atomic-grid.controller';
 import { AtomicGridNg2InMemoryDataProvider } from './atomic-grid.ng2.inmemory-data-provider.class';
 import { AtomicGridNg2SpringDataProvider } from './atomic-grid.ng2.spring-data-provider.class';
-import { AtomicGridPage } from '../core/atomic-grid.types';
+import { AtomicGridPage, AtomicGridDataProvider } from '../core/atomic-grid.types';
 
 @Directive({
   selector: '[atGridData],[atGridUrl]',
@@ -13,19 +13,21 @@ import { AtomicGridPage } from '../core/atomic-grid.types';
 })
 export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implements OnInit {
 
-  @Input('atGridData') data;
-  @Input('atGridUrl') url;
-  @Input('atGridDataProvider') dataProvider;
+  @Input('atGridData') data: Array<T>;
+  @Input('atGridUrl') url: string;
+  @Input('atGridDataProvider') dataProvider: AtomicGridDataProvider<T>;
   @Input('atGridAdditionalParameters') additionalParameters;
+  @Input('atGridAutoSearch') autoSearch: boolean = true;
 
   constructor(@Inject(Http) private http: Http) {
     super();
   }
 
   ngOnInit() {
-    this.setupDataProvider();
     this.setRequestParameterProvider(() => this.additionalParameters);
-    this.search();
+    if (this.autoSearch) {
+      this.search(true);
+    }
   }
 
   setupDataProvider() {
@@ -38,28 +40,30 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
       throw "Only one of the following attributes must be set: atGridData, atGridUrl, atGridDataProvider";
     }
 
-    if (this.data) {
-      this.setDataProvider(
-        new AtomicGridNg2InMemoryDataProvider(this.data)
-      );
-    }
-
     if (this.url) {
       this.setDataProvider(
         new AtomicGridNg2SpringDataProvider(this.http, this.url)
-      )
+      );
+      return
     }
+
+    this.setDataProvider(
+      new AtomicGridNg2InMemoryDataProvider(this.data || [])
+    );
   }
 
   search(reset?: boolean) {
     if (reset) {
       this.resetState();
+      this.setupDataProvider();
     }
 
     this._loading = true;
 
     var result: Observable<AtomicGridPage<T>> = <any>this._dataProvider
       .getPage(this._state, this._requestParameters());
+
+    let subject = new Subject();
 
     result
       .finally(() => {
@@ -68,12 +72,17 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
       })
       .subscribe(page => {
         this._page = page;
+        subject.next(page);
+        subject.complete();
       }, error => {
         this._page = {
           totalElements: 0,
           content: []
         };
+        subject.error(error);
       });
+
+    return subject.asObservable();
   }
 
 }

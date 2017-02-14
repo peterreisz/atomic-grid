@@ -3,7 +3,7 @@ import { AtomicGridSort } from '../core/atomic-grid.types';
 
 export class AtomicGridNg1SortController<T> {
 
-  static $inject = [ '$element' ];
+  static $inject = [ '$element', '$attrs' ];
 
   static template = `
     <span ng-transclude></span>
@@ -17,11 +17,15 @@ export class AtomicGridNg1SortController<T> {
   private sortFn;
   private atGrid: AtomicGridNg1Controller<T>;
 
-  constructor(private $element: JQueryStatic) { }
+  constructor(private $element: JQueryStatic, private $attrs: ng.IAttributes) { }
 
   $onInit() {
     this.sort = this.sortFn({}) || this.sort;
     this.$element.bind('click', $event => this.onClick($event));
+    let defaultSort: string = this.$attrs['atGridDefaultSort'];
+    if (typeof defaultSort !== 'undefined') {
+      this.atGrid.setSort(this.sort, defaultSort === 'true');
+    }
   }
 
   get sortBy(): AtomicGridSort {

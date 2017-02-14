@@ -35,45 +35,52 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
       this.$parse(this.name).assign(this.$scope, this);
     }
 
-    this.setupDataProvider();
     this.setRequestParameterProvider(
       () => this.additionalParameters({})
     );
+  }
 
+  $postLink() {
     if (this.autoSearch) {
-      this.search();
+      this.search(true);
+    }
+  }
+
+  $onChanges(change) {
+    if (this._dataProvider && change.data && change.data.currentValue) {
+      this.search(true);
     }
   }
 
   setupDataProvider() {
     let count = 0;
-    if (this.data) count++;
-    if (this.url) count++;
+    if (!!this.$attrs['atGridData']) count++;
+    if (!!this.$attrs['atGridUrl']) count++;
     if (!!this.$attrs['atGridDataProvider']) count++;
 
     if (count != 1) {
       throw "Only one of the following attributes must be set: at-grid-data, at-grid-url, at-grid-data-provider";
     }
 
-    if (this.data) {
-      this.setDataProvider(
-        new AtomicGridNg1InMemoryDataProvider(
-          this.data, this.$q
-        )
-      );
-    }
-
     if (this.url) {
       this.setDataProvider(
         new AtomicGridNg1SpringDataProvider(this.$http, this.$q, this.url)
-      )
+      );
+      return
     }
 
     if (this.$attrs['atGridDataProvider']) {
       this.setDataProvider({
         getPage: (state: AtomicGridState, additionalParams?: any): ng.IPromise<AtomicGridPage<T>> => this.dataProvider({state, additionalParams})
       });
+      return
     }
+
+    this.setDataProvider(
+      new AtomicGridNg1InMemoryDataProvider(
+        this.data || [], this.$q
+      )
+    );
   }
 
   search(reset?: boolean) {
@@ -82,17 +89,22 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
       this.resetState();
     }
 
+    if (reset || !this._dataProvider) {
+      this.setupDataProvider();
+    }
+
     this._loading = true;
 
     var promise:any = this._dataProvider
       .getPage(this._state, this._requestParameters());
 
-    promise.finally(() => {
+    return promise.finally(() => {
         this._selectedItems = [];
         this._loading = false;
       })
       .then(page => {
         this.setPageData(page);
+        return page;
       }, error => {
         this.setPageData({
           totalElements: 0,

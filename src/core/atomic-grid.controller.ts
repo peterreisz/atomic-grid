@@ -1,4 +1,6 @@
+import { Observable } from 'rxjs';
 import { AtomicGridPage, AtomicGridState, AtomicGridDataProvider, AtomicGridSort, AtomicGridPagerItem } from './atomic-grid.types';
+import { AtomicGridSpringDataProvider } from './atomic-grid-spring-data-provider.class';
 
 export abstract class AtomicGridController<T> {
 
@@ -24,6 +26,13 @@ export abstract class AtomicGridController<T> {
     this._state.page = 0;
   }
 
+  getRequestParameters() {
+    if (this._dataProvider instanceof AtomicGridSpringDataProvider) {
+      return this._dataProvider.createParams(this._state, this._requestParameters());
+    }
+    throw "Operation not supported";
+  }
+
   setDataProvider(dataProvider: AtomicGridDataProvider<T>) {
     this._dataProvider = dataProvider;
     return this;
@@ -44,7 +53,7 @@ export abstract class AtomicGridController<T> {
     this.reCalculatePager()
   }
 
-  abstract search();
+  abstract search(reset?: boolean): ng.IPromise<AtomicGridPage<T>> | Observable<AtomicGridPage<T>>;
 
   get isPrevEnabled() {
     return !this.loading && this.page > 1;
@@ -149,15 +158,7 @@ export abstract class AtomicGridController<T> {
 
   // Handle sorting
 
-  sort(sortBy: string|Function, append?: boolean) {
-    let sort = this.getSortBy(sortBy);
-    let reverse;
-    if (sort === undefined) {
-      reverse = false;
-    } else if (sort.reverse === false) {
-      reverse = true;
-    }
-
+  setSort(sortBy: string|Function, reverse: boolean, append?: boolean) {
     this._state.page = 0;
     if (reverse === undefined && !append) {
       this._state.sort = [];
@@ -179,7 +180,18 @@ export abstract class AtomicGridController<T> {
         sortBy, reverse
       }];
     }
+  }
 
+  sort(sortBy: string|Function, append?: boolean) {
+    let sort = this.getSortBy(sortBy);
+    let reverse;
+    if (sort === undefined) {
+      reverse = false;
+    } else if (sort.reverse === false) {
+      reverse = true;
+    }
+
+    this.setSort(sortBy, reverse, append);
     this.search();
   }
 
