@@ -5,7 +5,6 @@ import { AtomicGridNg1InMemoryDataProvider } from './atomic-grid.ng1.inmemory-da
 export class AtomicGridNg1SpringDataProvider<T> extends AtomicGridSpringDataProvider<T> {
 
   constructor(private $http: ng.IHttpService,
-              private $q: ng.IQService,
               private url: string) {
     super();
   }
@@ -21,7 +20,7 @@ export class AtomicGridNg1SpringDataProvider<T> extends AtomicGridSpringDataProv
           return page;
         }
 
-        this.provider = new AtomicGridNg1InMemoryDataProvider(<any>page, this.$q);
+        this.provider = new AtomicGridNg1InMemoryDataProvider(<any>page);
         return this.getPage(state, additionalParams);
       });
   }

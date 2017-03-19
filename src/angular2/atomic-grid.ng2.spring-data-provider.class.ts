@@ -1,6 +1,7 @@
-import { Observable } from 'rxjs';
+import 'rxjs/add/operator/toPromise';
+
 import { Http, URLSearchParams } from '@angular/http';
-import { AtomicGridDataProvider, AtomicGridState } from '../core/atomic-grid.types';
+import { AtomicGridDataProvider, AtomicGridState, AtomicGridPage } from '../core/atomic-grid.types';
 import { AtomicGridSpringDataProvider } from '../core/atomic-grid-spring-data-provider.class';
 import { AtomicGridNg2InMemoryDataProvider } from './atomic-grid.ng2.inmemory-data-provider.class';
 
@@ -33,10 +34,12 @@ export class AtomicGridNg2SpringDataProvider<T> extends AtomicGridSpringDataProv
 
     return this.http
       .get(this.url, { search })
-      .map(response => response.json())
-      .mergeMap(page => {
+      .toPromise()
+      .then(response => response.json())
+      .then((page: AtomicGridPage<T>) => {
+
         if (this.isSpringDataPage(page)) {
-          return Observable.of(page);
+          return page;
         }
 
         this.provider = new AtomicGridNg2InMemoryDataProvider(<any>page);

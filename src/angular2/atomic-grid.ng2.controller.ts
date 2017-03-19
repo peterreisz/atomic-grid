@@ -1,11 +1,9 @@
-import { Observable, Subject } from 'rxjs';
-
 import { Directive, Input, OnInit, Inject } from '@angular/core';
 import { Http } from '@angular/http';
 import { AtomicGridController } from '../core/atomic-grid.controller';
 import { AtomicGridNg2InMemoryDataProvider } from './atomic-grid.ng2.inmemory-data-provider.class';
 import { AtomicGridNg2SpringDataProvider } from './atomic-grid.ng2.spring-data-provider.class';
-import { AtomicGridPage, AtomicGridDataProvider } from '../core/atomic-grid.types';
+import { AtomicGridDataProvider } from '../core/atomic-grid.types';
 
 @Directive({
   selector: '[atGridData],[atGridUrl]',
@@ -44,7 +42,7 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
       this.setDataProvider(
         new AtomicGridNg2SpringDataProvider(this.http, this.url)
       );
-      return
+      return;
     }
 
     this.setDataProvider(
@@ -52,37 +50,14 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
     );
   }
 
-  search(reset?: boolean) {
-    if (reset) {
-      this.resetState();
-      this.setupDataProvider();
-    }
+  canChangeState() {
+    // TODO
+    return Promise.resolve()
+  }
 
-    this._loading = true;
-
-    var result: Observable<AtomicGridPage<T>> = <any>this._dataProvider
-      .getPage(this._state, this._requestParameters());
-
-    let subject = new Subject();
-
-    result
-      .finally(() => {
-        this._selectedItems = [];
-        this._loading = false;
-      })
-      .subscribe(page => {
-        this._page = page;
-        subject.next(page);
-        subject.complete();
-      }, error => {
-        this._page = {
-          totalElements: 0,
-          content: []
-        };
-        subject.error(error);
-      });
-
-    return subject.asObservable();
+  canChangeSelection() {
+    // TODO
+    return Promise.resolve()
   }
 
 }

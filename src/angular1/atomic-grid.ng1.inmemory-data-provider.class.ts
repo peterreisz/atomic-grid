@@ -3,12 +3,12 @@ import { AtomicGridState, AtomicGridPage } from '../core/atomic-grid.types';
 
 export class AtomicGridNg1InMemoryDataProvider<T> extends AtomicGridInMemoryDataProvider<T> {
 
-  constructor(data: Array<T>, private $q: ng.IQService) {
+  constructor(data: Array<T>) {
     super(data);
   }
 
-  getPage(state: AtomicGridState, additionalParams?: any): ng.IPromise<AtomicGridPage<T>> {
-    return this.$q.when(this.getPageData(state, additionalParams));
+  getPage(state: AtomicGridState, additionalParams?: any): Promise<AtomicGridPage<T>> {
+    return Promise.resolve(this.getPageData(state, additionalParams));
   }
 
 }

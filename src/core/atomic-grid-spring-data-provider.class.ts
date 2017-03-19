@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-
 import { AtomicGridDataProvider, AtomicGridState, AtomicGridPage } from './atomic-grid.types';
 
 export abstract class AtomicGridSpringDataProvider<T> implements AtomicGridDataProvider<T> {
@@ -20,7 +18,7 @@ export abstract class AtomicGridSpringDataProvider<T> implements AtomicGridDataP
     return params;
   }
 
-  getPage(state: AtomicGridState, additionalParams?: any): ng.IPromise<AtomicGridPage<T>> | Observable<AtomicGridPage<T>> {
+  getPage(state: AtomicGridState, additionalParams?: any): Promise<AtomicGridPage<T>> {
     if (this.provider) {
       return this.provider.getPage(state, additionalParams);
     }

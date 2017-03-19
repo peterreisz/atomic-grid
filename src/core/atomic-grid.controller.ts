@@ -1,4 +1,3 @@
-import { Observable } from 'rxjs';
 import { AtomicGridPage, AtomicGridState, AtomicGridDataProvider, AtomicGridSort, AtomicGridPagerItem } from './atomic-grid.types';
 import { AtomicGridSpringDataProvider } from './atomic-grid-spring-data-provider.class';
 
@@ -53,7 +52,47 @@ export abstract class AtomicGridController<T> {
     this.reCalculatePager()
   }
 
-  abstract search(reset?: boolean): ng.IPromise<AtomicGridPage<T>> | Observable<AtomicGridPage<T>>;
+  abstract setupDataProvider();
+
+  onStateChanged() {}
+
+  search(reset?: boolean) {
+
+    if (reset) {
+      this.resetState();
+    }
+
+    if (reset || !this._dataProvider) {
+      this.setupDataProvider();
+    }
+
+    this._loading = true;
+
+    return this._dataProvider
+      .getPage(this._state, this._requestParameters())
+      .then(page => {
+        this._selectedItems = [];
+        this._loading = false;
+        this.setPageData(page);
+        this.onStateChanged();
+        return page;
+      }, error => {
+        this._selectedItems = [];
+        this._loading = false;
+        this.setPageData({
+          totalElements: 0,
+          content: []
+        });
+        this.onStateChanged();
+        return error;
+      });
+  }
+
+  canChangeState(): Promise<void> {
+    return this.canChangeSelection();
+  }
+
+  abstract canChangeSelection(): Promise<void>
 
   get isPrevEnabled() {
     return !this.loading && this.page > 1;
@@ -71,9 +110,15 @@ export abstract class AtomicGridController<T> {
   }
 
   set size(newPageSize: number) {
-    this._state.page = 0;
-    this._state.size = parseInt(<any>newPageSize);
-    this.search();
+    this.canChangeState().then(() => {
+      this._state.page = 0;
+      this._state.size = parseInt(<any>newPageSize);
+      this.search();
+    }, () => {});
+  }
+
+  setSize(newPageSize: number) {
+    this._state.size = newPageSize;
   }
 
   get page() {
@@ -81,8 +126,14 @@ export abstract class AtomicGridController<T> {
   }
 
   set page(newPageNumber: number) {
+    this.canChangeState().then(() => {
+      this._state.page = newPageNumber - 1;
+      this.search();
+    }, () => {});
+  }
+
+  setPage(newPageNumber: number) {
     this._state.page = newPageNumber - 1;
-    this.search();
   }
 
   first() {
@@ -183,16 +234,18 @@ export abstract class AtomicGridController<T> {
   }
 
   sort(sortBy: string|Function, append?: boolean) {
-    let sort = this.getSortBy(sortBy);
-    let reverse;
-    if (sort === undefined) {
-      reverse = false;
-    } else if (sort.reverse === false) {
-      reverse = true;
-    }
+    this.canChangeState().then(() => {
+      let sort = this.getSortBy(sortBy);
+      let reverse;
+      if (sort === undefined) {
+        reverse = false;
+      } else if (sort.reverse === false) {
+        reverse = true;
+      }
 
-    this.setSort(sortBy, reverse, append);
-    this.search();
+      this.setSort(sortBy, reverse, append);
+      this.search();
+    }, () => {});
   }
 
   getSortBy(sortBy: string|Function): AtomicGridSort {
@@ -238,36 +291,39 @@ export abstract class AtomicGridController<T> {
   }
 
   selectItem(selected: boolean, item?: T) {
-    if (item) {
-      if (selected) {
-        if (this._selectedItems.filter(i => i === item).length == 0) {
-          if (this._multiSelection) {
-            this._selectedItems.push(item);
-          } else {
-            this._selectedItems = [ item ];
+    this.canChangeSelection().then(() => {
+      if (item) {
+        if (selected) {
+          if (this._selectedItems.filter(i => i === item).length == 0) {
+            if (this._multiSelection) {
+              this._selectedItems.push(item);
+            } else {
+              this._selectedItems = [ item ];
+            }
           }
-        }
-      } else {
-        this._selectedItems = this._selectedItems.filter(i => i !== item);
-      }
-    } else {
-      if (selected) {
-        if (this._multiSelection) {
-          this._selectedItems = this._page.content.concat();
         } else {
-          this._selectedItems = [ this._page.content[0] ];
+          this._selectedItems = this._selectedItems.filter(i => i !== item);
         }
       } else {
-        this._selectedItems = [];
+        if (selected) {
+          if (this._multiSelection) {
+            this._selectedItems = this._page.content.concat();
+          } else {
+            this._selectedItems = [ this._page.content[0] ];
+          }
+        } else {
+          this._selectedItems = [];
+        }
       }
-    }
+      this.onStateChanged();
+    }, () => {});
   }
 
   toggleItemSelection(item?: T) {
     this.selectItem(!this.isItemSelected(item), item);
   }
 
-  isItemSelected(item?: T) {
+  isItemSelected(item?: T): boolean {
     var pageSizeLength = this._state.size;
     if (this.items) {
       pageSizeLength = Math.min(this.items.length || pageSizeLength, pageSizeLength);
@@ -280,7 +336,7 @@ export abstract class AtomicGridController<T> {
     } else if (this._selectedItems.length == 0) {
       return false;
     }
-    return null;
+    return false;
   }
 
 }

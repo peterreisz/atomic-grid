@@ -1,5 +1,3 @@
-import { Observable } from 'rxjs';
-
 export interface AtomicGridState {
   size: number
   page: number
@@ -18,7 +16,7 @@ export interface AtomicGridPage<T> {
 }
 
 export interface AtomicGridDataProvider<T> {
-  getPage(state: AtomicGridState, additionalParams?: any): ng.IPromise<AtomicGridPage<T>> | Observable<AtomicGridPage<T>>;
+  getPage(state: AtomicGridState, additionalParams?: any): Promise<AtomicGridPage<T>>;
 }
 
 export interface AtomicGridPagerItem {

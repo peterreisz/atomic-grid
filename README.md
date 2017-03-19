@@ -37,9 +37,7 @@ angular.module('app', [ AtomicGridNg1ModuleFactory(angular) ]);
 <table at-grid="myGrid"
        at-grid-data="..."
        at-grid-url="..."
-       at-grid-data-provider="..."
-       at-grid-additional-parameters="..."
-       at-grid-multi-selection="...">
+       at-grid-data-provider="...">
   <tr>
     <th at-grid-sort="...">...</th>
     ...
@@ -73,9 +71,7 @@ export class AppModule { }
 <table #myGrid="atGrid"
        [atGridData]="..."
        [atGridUrl]="..."
-       [atGridDataProvider]="..."
-       [atGridMultiSelection]="..."
-       [atGridAdditionalParameters]="...">
+       [atGridDataProvider]="...">
   <tr>
     <th atGridSort="...">...</th>
   </tr>
@@ -92,29 +88,113 @@ See them under the examples folder
 
 ## Api
 
-### Attributes
+### Bindings
 
-`at-grid="myGrid"` / `#mygrid="atGrid"`:
-Register the grid controller to the context 
+Angular 1 | Angular 2 | Description
+--- | --- | ---
+`at-grid="myGrid"` | `#mygrid="atGrid"` | Create a reference for the controller
+`at-grid-data="anArray"` | `[atGridData]="anArray"` | Set an array data provider
+`at-grid-url="api/resource"` | `atGridUrl="api/resource"` | Set a spring data compatible url data provider
+`at-grid-data-provider="..."` | TODO | Custom data provider
+`at-grid-additional-parameters="params"` | `[atGridAdditionalParameters]="params"` | Additional parameters for the data provider 
+`at-grid-multi-selection="false"` | `[atGridMultiSelection]="false"` | Turn on/off the multi selection
+`at-grid-can-change-state="booleanOrPromise"` | TODO | Request confirmation in case grid state changes (sort, page, size)
+`at-grid-can-change-selection="booleanOrPromise"` | TODO | Request confirmation in case selection changes (sort, page, size, selection)
 
-`atGridData` / `at-grid-data`:
-Array of the data
+### Basics
 
-`atGridUrl` / `at-grid-url`:
-Url for requesting data from the server
+Controller method / property | Description
+--- | ---
+`search(): Promise<AtomicGridPage<T>>` | Do a search with the current state of the grid
+`items: Array<T>` | Get the content of the actual page
 
-Format: GET `url?page=X&size=X&sort=X,asc/desc&additionalparam1=value1...`
+### Information
 
-Fully compatible with spring data controller (Pageable, Page&lt;T&gt;)
+Controller method / property | Description
+--- | ---
+`size: number` | Get the actual page size
+`page: number` | Get the actual page number
+`totalElements: number` | Get the number of total elements
+`totalPages: number` | Get the number of total pages
+`pageStart: number` | Get the starting record number of the page
+`pageEnd: number` | Get the ending record number of the page
+`loading: boolean` | Is grid refreshing in progress
 
-`atGridDataProvider` / `at-grid-data-provider`:
-Custom data provider
+### Paging
+Controller method / property | Description
+--- | ---
+`isPrevEnabled(): boolean` | Is the previous paging enabled?
+`isNextEnabled(): boolean` | Is the next paging enabled?
+`first(): void` | Jump to the first page
+`prev(): void` | Jump to the previous page
+`next(): void` | Jump to the next page
+`last(): void` | Jump to the last page
+`pager: Array<AtomicGridPagerItem>` | Get a pager object to render paging toolbar for the grid
 
-`atGridAdditionalParameters` / `at-grid-additional-parameters`:
-Additional parameters for the data provider 
+### Sorting
+Controller method / property | Description
+--- | ---
+`setSort(sortBy: string|Function, reverse: boolean, append?: boolean): void` | Change the grid sorting without doing a search.
+`sort(sortBy: string|Function, append?: boolean)` | Change the grid sorting and refresh it's content
+`getSortBy(sortBy: string|Function): AtomicGridSort` | Is the grid sort by the given field
 
-`atGridMultiSelection` / `at-grid-multi-selection`:
-Turn on/off the multi selection
+### Paging
+Controller method / property | Description
+--- | ---
+`setSize(newPageSize: number): void` | Change the grid page size without doing a search
+`size: number` | Changing the property will change the page size and refresh the grid's content
+`setPage(newPageNumber: number): void` | Change the grid page number without doing a search
+`page: number` | Changing the property will change the page number and refresh the grid's content
+
+
+### Selection
+Controller method / property | Description
+--- | ---
+`multiSelection: boolean` | Getter/setter for is the multiselection enabled for the grid
+`selectedItem: undefined | T` | Get the selected item if multiselection is disabled
+`selectedItem: undefined| Array<T>` | Get the selected items if multiselection is enabled
+
+## Use cases
+
+### Initialize grid state with custom paging and sorting parameters
+
+```html
+<!-- Create a reference to the grid controller and disable autosearch -->
+<table at-grid="$ctrl.myGrid" at-grid-auto-search="false">...</table>
+```
+
+```ts
+myGrid: AtomicGridNg1Controller<T>
+
+$postLink() {
+  this.myGrid.setSort('field1', true); // Reverse sort by the field1
+  this.myGrid.setSort('field2', false, true); // Sort by the field2 appended as second sorting
+  this.myGrid.setSize(20); // Set page size to 20
+  this.myGrid.setPage(2); // Go the the 2nd page
+  this.myGrid.search(); // Do a search to fetch data
+}
+```
+
+### Prevent changing the grid state
+
+```html
+<table at-grid="$ctrl.myGrid" at-grid-can-change-state="$ctrl.canChangeState()">...</table>
+```
+
+```ts
+constructor(private $q: ng.IQService) { }
+
+myGrid: AtomicGridNg1Controller<T>
+
+canChangeState() {
+  if (haveWeUnsavedData()) {
+    return this.$q((resolve, reject) => {
+      confirm("Unsaved data will be lost, are you sure?") ? resolve() : reject()
+    });
+  }
+  return true;
+}
+```
 
 
 
