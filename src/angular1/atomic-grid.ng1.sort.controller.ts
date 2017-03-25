@@ -7,17 +7,15 @@ export class AtomicGridNg1SortController<T> {
 
   static template = `
     <span ng-transclude></span>
-    
-    <span class="glyphicon glyphicon-chevron-up" ng-show="$atGridSort.sortBy.reverse === false"></span>
-    <span class="glyphicon glyphicon-chevron-down" ng-show="$atGridSort.sortBy.reverse === true"></span>
-    <span class="badge">{{ $atGridSort.sortBy.index }}</span>
+    <span class="sort-icon"></span>
+    <span class="sort-index" ng-if="$atGridSort.sortBy.index">{{ $atGridSort.sortBy.index }}</span>
   `;
 
   private sort;
   private sortFn;
   private atGrid: AtomicGridNg1Controller<T>;
 
-  constructor(private $element: JQueryStatic, private $attrs: ng.IAttributes) { }
+  constructor(private $element: ng.IAugmentedJQuery, private $attrs: ng.IAttributes) { }
 
   $onInit() {
     this.sort = this.sortFn({}) || this.sort;
@@ -28,11 +26,33 @@ export class AtomicGridNg1SortController<T> {
     }
   }
 
+  $doCheck() {
+    if (this.oldSortBy !== this.sortBy) {
+      this.oldSortBy = this.sortBy;
+
+      if (this.oldSortBy === undefined) {
+        this.$element.removeClass('sort-asc');
+        this.$element.removeClass('sort-desc');
+      }
+
+      if (this.oldSortBy.reverse === true) {
+        this.$element.addClass('sort-asc');
+        this.$element.removeClass('sort-desc');
+      }
+
+      if (this.oldSortBy.reverse === false) {
+        this.$element.removeClass('sort-asc');
+        this.$element.addClass('sort-desc');
+      }
+    }
+  }
+
+  private oldSortBy: AtomicGridSort;
   get sortBy(): AtomicGridSort {
     return this.atGrid.getSortBy(this.sort);
   }
 
-  onClick($event: MouseEvent) {
+  onClick($event: JQueryMouseEventObject) {
     this.atGrid.sort(this.sort, $event.ctrlKey);
   }
 }

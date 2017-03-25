@@ -8,10 +8,18 @@ export abstract class AtomicGridSpringDataProvider<T> implements AtomicGridDataP
 
   createParams(state: AtomicGridState, additionalParams?: any): any {
     let params: any = {
-      ...additionalParams,
       size: state.size,
       page: state.page
     };
+
+    Object.keys(additionalParams).forEach(
+      key => {
+        let value = additionalParams[key];
+        if (value !== undefined && value !== '') {
+          params[key] = value;
+        }
+      }
+    );
 
     params.sort = state.sort.map(item => item.sortBy + ',' + (item.reverse ? 'desc' : 'asc'));
 

@@ -3,10 +3,10 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  private data = [];
+  public data = [];
 
   constructor() {
     for (var i=0; i<100; i++) {
@@ -15,7 +15,7 @@ export class AppComponent {
         b: Math.random() * 100,
         c: Math.random() * 100,
         d: Math.random() * 100
-      })
+      });
     }
   }
 }

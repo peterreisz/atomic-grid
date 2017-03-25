@@ -1,0 +1,22 @@
+@import '~bootstrap/less/bootstrap';
+
+[at-grid-sort] {
+  user-select: none;
+  cursor: pointer;
+}
+
+[at-grid-sort] .sort-index {
+  .badge();
+}
+
+[at-grid-sort] .sort-icon {
+  .glyphicon();
+}
+
+.sort-asc[at-grid-sort] .sort-icon {
+  .glyphicon-chevron-up();
+}
+
+.sort-desc[at-grid-sort] .sort-icon {
+  .glyphicon-chevron-down();
+}

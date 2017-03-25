@@ -1,8 +1,7 @@
 // Hack, because https://github.com/Microsoft/TypeScript/issues/2920#issuecomment-97300263
 declare function require(path: string): string;
 
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/css/bootstrap-theme.css';
+import './AppComponent.less';
 
 import * as angular from 'angular';
 

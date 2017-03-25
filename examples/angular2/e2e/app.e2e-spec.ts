@@ -1,6 +1,6 @@
 import { AtomicGridExamplePage } from './app.po';
 
-describe('atomic-grid-example App', function() {
+describe('atomic-grid-example App', () => {
   let page: AtomicGridExamplePage;
 
   beforeEach(() => {

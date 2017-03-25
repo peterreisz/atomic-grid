@@ -3,7 +3,7 @@ import { AtomicGridSpringDataProvider } from './atomic-grid-spring-data-provider
 
 export abstract class AtomicGridController<T> {
 
-  protected pageSizes = [10, 20, 50, 100];
+  public pageSizes = [10, 20, 50, 100];
 
   protected _page: AtomicGridPage<T>;
 
@@ -323,7 +323,7 @@ export abstract class AtomicGridController<T> {
     this.selectItem(!this.isItemSelected(item), item);
   }
 
-  isItemSelected(item?: T): boolean {
+  isItemSelected(item?: T): boolean|null {
     var pageSizeLength = this._state.size;
     if (this.items) {
       pageSizeLength = Math.min(this.items.length || pageSizeLength, pageSizeLength);
@@ -336,7 +336,7 @@ export abstract class AtomicGridController<T> {
     } else if (this._selectedItems.length == 0) {
       return false;
     }
-    return false;
+    return null; // intermediate
   }
 
 }

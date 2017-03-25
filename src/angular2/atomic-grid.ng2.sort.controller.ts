@@ -1,4 +1,4 @@
-import { Component, Input, Host, HostListener, Inject } from '@angular/core';
+import { Component, Input, Host, HostListener, Inject, HostBinding } from '@angular/core';
 import { AtomicGridNg2Controller } from './atomic-grid.ng2.controller';
 import { AtomicGridSort } from '../core/atomic-grid.types';
 
@@ -7,9 +7,8 @@ import { AtomicGridSort } from '../core/atomic-grid.types';
   template: `
     <span>
       <ng-content></ng-content>
-      <span class="glyphicon glyphicon-chevron-up" *ngIf="sortBy?.reverse === false"></span>
-      <span class="glyphicon glyphicon-chevron-down" *ngIf="sortBy?.reverse === true"></span>
-      {{ sortBy?.index }}
+      <span class="sort-icon"></span>
+      <span class="sort-index" *ngIf="sortBy?.index">{{ sortBy?.index }}</span>
     </span>
     `
 })
@@ -21,6 +20,16 @@ export class AtomicGridNg2SortController<T> {
 
   get sortBy(): AtomicGridSort {
     return this.atGrid.getSortBy(this.sort);
+  }
+
+  @HostBinding('class.sort-asc')
+  get sortAsc() {
+    return this.sortBy && this.sortBy.reverse === false;
+  }
+
+  @HostBinding('class.sort-desc')
+  get sortDesc() {
+    return this.sortBy && this.sortBy.reverse === true;
   }
 
   @HostListener('click', ['$event'])

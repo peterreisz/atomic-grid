@@ -1,0 +1,25 @@
+/* You can add global styles to this file, and also import other style files */
+
+$icon-font-path: "~bootstrap-sass/assets/fonts/bootstrap/";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap";
+
+[atGridSort] {
+  user-select: none;
+  cursor: pointer;
+}
+
+[atGridSort] .sort-index {
+  @extend .badge;
+}
+
+[atGridSort] .sort-icon {
+  @extend .glyphicon;
+}
+
+.sort-asc[atGridSort] .sort-icon {
+  @extend .glyphicon-chevron-up;
+}
+
+.sort-desc[atGridSort] .sort-icon {
+  @extend .glyphicon-chevron-down;
+}

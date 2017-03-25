@@ -1,6 +1,6 @@
 {
   "name": "atomic-grid",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Controller and data provider building blocks to create your own very special angular grid without writing any boilerplate code.",
   "scripts": {
     "ngc": "ngc",
@@ -24,12 +24,12 @@
     "ts-helpers": "^1.1.2"
   },
   "devDependencies": {
-    "@angular/common": "^2.4.4",
-    "@angular/compiler": "^2.4.4",
-    "@angular/compiler-cli": "^2.4.4",
-    "@angular/core": "^2.4.4",
-    "@angular/http": "^2.4.4",
-    "@angular/platform-browser": "^2.4.4",
+    "@angular/common": "^4.0.0",
+    "@angular/compiler": "^4.0.0",
+    "@angular/compiler-cli": "^4.0.0",
+    "@angular/core": "^4.0.0",
+    "@angular/http": "^4.0.0",
+    "@angular/platform-browser": "^4.0.0",
     "@types/angular": "^1.6.0",
     "rimraf": "^2.5.4",
     "rollup": "^0.41.4",

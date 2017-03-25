@@ -1,5 +1,4 @@
-<table class="table table-striped table-hover" at-grid="myGrid"
-       at-grid-data="$ctrl.data"
+<table class="table table-striped table-hover" at-grid="$ctrl.myGrid" at-grid-data="$ctrl.data"
        at-grid-multi-selection="$ctrl.multiSelection">
   <!--
        at-grid-auto-search="true"
@@ -15,9 +14,9 @@
     <th at-grid-sort="c">c</th>
     <th at-grid-sort="d">d</th>
   </tr>
-  <tr ng-repeat="item in myGrid.items"
-      ng-click="myGrid.toggleItemSelection(item)"
-      ng-class="{'success': myGrid.isItemSelected(item)}">
+  <tr ng-repeat="item in $ctrl.myGrid.items"
+      ng-click="$ctrl.myGrid.toggleItemSelection(item)"
+      ng-class="{'success': $ctrl.myGrid.isItemSelected(item)}">
     <td>{{ item.a }}</td>
     <td>{{ item.b }}</td>
     <td>{{ item.c }}</td>
@@ -29,42 +28,42 @@
   <input type="checkbox" ng-model="$ctrl.multiSelection"> Multi selection
 </label><br/>
 
-Selected item: {{ myGrid.selectedItem }}<br/>
-Selected items: {{ myGrid.selectedItems }}<br/>
-AllSelection: {{ myGrid.isItemSelected() }}<br/>
-Page: {{ myGrid.page }}<br/>
-TotalPages: {{ myGrid.totalPages }}<br/>
-Start: {{ myGrid.pageStart }}<br/>
-End: {{ myGrid.pageEnd }}<br/>
-TotalElements: {{ myGrid.totalElements }}<br/>
+Selected item: {{ $ctrl.myGrid.selectedItem }}<br/>
+Selected items: {{ $ctrl.myGrid.selectedItems }}<br/>
+AllSelection: {{ $ctrl.myGrid.isItemSelected() }}<br/>
+Page: {{ $ctrl.myGrid.page }}<br/>
+TotalPages: {{ $ctrl.myGrid.totalPages }}<br/>
+Start: {{ $ctrl.myGrid.pageStart }}<br/>
+End: {{ $ctrl.myGrid.pageEnd }}<br/>
+TotalElements: {{ $ctrl.myGrid.totalElements }}<br/>
 Size:
-<select ng-model="myGrid.size" ng-options="size for size in myGrid.pageSizes"></select><br/>
+<select ng-model="$ctrl.myGrid.size" ng-options="size for size in $ctrl.myGrid.pageSizes"></select><br/>
 
 Pager:
 
 
 
 <div class="btn-group">
-  <button class="btn btn-default" ng-disabled="!myGrid.isPrevEnabled" ng-click="myGrid.first()">
+  <button class="btn btn-default" ng-disabled="!$ctrl.myGrid.isPrevEnabled" ng-click="$ctrl.myGrid.first()">
     <span class="glyphicon glyphicon-step-backward"></span>
   </button>
-  <button class="btn btn-default" ng-disabled="!myGrid.isPrevEnabled" ng-click="myGrid.prev()">
+  <button class="btn btn-default" ng-disabled="!$ctrl.myGrid.isPrevEnabled" ng-click="$ctrl.myGrid.prev()">
     <span class="glyphicon glyphicon-chevron-left"></span>
   </button>
-  <button ng-repeat="page in myGrid.pager"
+  <button ng-repeat="page in $ctrl.myGrid.pager"
           ng-click="page.jump()"
           ng-class="{'btn-primary': page.active}"
           class="btn btn-default">
     {{ page.number }}
   </button>
-  <button class="btn btn-default" ng-disabled="!myGrid.isNextEnabled" ng-click="myGrid.next()">
+  <button class="btn btn-default" ng-disabled="!$ctrl.myGrid.isNextEnabled" ng-click="$ctrl.myGrid.next()">
     <span class="glyphicon glyphicon-chevron-right"></span>
   </button>
-  <button class="btn btn-default" ng-disabled="!myGrid.isNextEnabled" ng-click="myGrid.last()">
+  <button class="btn btn-default" ng-disabled="!$ctrl.myGrid.isNextEnabled" ng-click="$ctrl.myGrid.last()">
     <span class="glyphicon glyphicon-step-forward"></span>
   </button>
 </div>
 
 <br/>
-<button class="btn btn-default" ng-click="myGrid.toggleItemSelection()">Toggle all selection</button>
-<button class="btn btn-default" ng-click="myGrid.search(true)">Search</button>
+<button class="btn btn-default" ng-click="$ctrl.myGrid.toggleItemSelection()">Toggle all selection</button>
+<button class="btn btn-default" ng-click="$ctrl.myGrid.search(true)">Search</button>
