@@ -98,8 +98,6 @@ Angular 1 | Angular 2 | Description
 `at-grid-data-provider="..."` | TODO | Custom data provider
 `at-grid-additional-parameters="params"` | `[atGridAdditionalParameters]="params"` | Additional parameters for the data provider 
 `at-grid-multi-selection="false"` | `[atGridMultiSelection]="false"` | Turn on/off the multi selection
-`at-grid-can-change-state="booleanOrPromise"` | TODO | Request confirmation in case grid state changes (sort, page, size)
-`at-grid-can-change-selection="booleanOrPromise"` | TODO | Request confirmation in case selection changes (sort, page, size, selection)
 
 ### Basics
 
@@ -109,7 +107,6 @@ Controller method / property | Description
 `items: Array<T>` | Get the content of the actual page
 
 ### Information
-
 Controller method / property | Description
 --- | ---
 `size: number` | Get the actual page size
@@ -154,6 +151,14 @@ Controller method / property | Description
 `selectedItem: undefined | T` | Get the selected item if multiselection is disabled
 `selectedItem: undefined| Array<T>` | Get the selected items if multiselection is enabled
 
+### Events
+Controller method / property | Description
+--- | ---
+`onBeforeSearch(listener)` | Trigger before do a search, can be cancelled
+`onAfterSearch(listener)` | Trigger after do a search
+`onBeforeChangeState(listener)` | Trigger before change state (page, size, sort), can be cancelled
+`onBeforeChangeSelection(listener)` | Trigger before change selection (page, size, sort, selection), can be cancelled
+
 ## Use cases
 
 ### Initialize grid state with custom paging and sorting parameters
@@ -177,22 +182,14 @@ $postLink() {
 
 ### Prevent changing the grid state
 
-```html
-<table at-grid="$ctrl.myGrid" at-grid-can-change-state="$ctrl.canChangeState()">...</table>
-```
-
 ```ts
-constructor(private $q: ng.IQService) { }
-
 myGrid: AtomicGridNg1Controller<T>
 
-canChangeState() {
-  if (haveWeUnsavedData()) {
-    return this.$q((resolve, reject) => {
-      confirm("Unsaved data will be lost, are you sure?") ? resolve() : reject()
-    });
-  }
-  return true;
+$postLink() {
+  this.myGrid.onBeforeChangeState((event: CustomEvent) => {
+    event.preventDefault();
+    confirm('sdfasdf') && event.detail.do();
+  });
 }
 ```
 

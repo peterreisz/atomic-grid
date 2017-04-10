@@ -3,6 +3,11 @@ import { AtomicGridSpringDataProvider } from './atomic-grid-spring-data-provider
 
 export abstract class AtomicGridController<T> {
 
+  public static BEFORE_SEARCH_EVENT = 'before-search';
+  public static AFTER_SEARCH_EVENT = 'after-search';
+  public static BEFORE_CHANGE_STATE = 'before-change-state';
+  public static BEFORE_CHANGE_SELECTION = 'before-change-selection';
+
   public pageSizes = [10, 20, 50, 100];
 
   protected _page: AtomicGridPage<T>;
@@ -17,8 +22,42 @@ export abstract class AtomicGridController<T> {
 
   protected _dataProvider: AtomicGridDataProvider<T>;
 
-  constructor() {
+  constructor(private element: HTMLElement) {
     this.resetState();
+  }
+
+  protected addEventListener(type: string, listener: EventListenerOrEventListenerObject, useCapture?: boolean): Function {
+    this.element.addEventListener(type, listener, useCapture);
+    return () => this.element.removeEventListener(type, listener, useCapture)
+  }
+
+  protected dispatchBeforeEvent(doHandler: Function, ...types: string[]) {
+    let events = types.map(type => new CustomEvent(type, {
+      cancelable: true,
+      detail: {
+        do: doHandler
+      }
+    }));
+
+    if (events.every(event => this.element.dispatchEvent(event))) {
+      return doHandler();
+    }
+  }
+
+  onBeforeSearch(listener: EventListenerOrEventListenerObject) {
+    return this.addEventListener(AtomicGridController.BEFORE_SEARCH_EVENT, listener);
+  }
+
+  onAfterSearch(listener: EventListenerOrEventListenerObject) {
+    return this.addEventListener(AtomicGridController.AFTER_SEARCH_EVENT, listener);
+  }
+
+  onBeforeChangeState(listener: EventListenerOrEventListenerObject) {
+    return this.addEventListener(AtomicGridController.BEFORE_CHANGE_STATE, listener);
+  }
+
+  onBeforeChangeSelection(listener: EventListenerOrEventListenerObject) {
+    return this.addEventListener(AtomicGridController.BEFORE_CHANGE_SELECTION, listener);
   }
 
   resetState() {
@@ -54,45 +93,38 @@ export abstract class AtomicGridController<T> {
 
   abstract setupDataProvider();
 
-  onStateChanged() {}
+  search(reset?: boolean): Promise<void> {
+    return this.dispatchBeforeEvent(() => {
+      if (reset) {
+        this.resetState();
+      }
 
-  search(reset?: boolean) {
+      if (reset || !this._dataProvider) {
+        this.setupDataProvider();
+      }
 
-    if (reset) {
-      this.resetState();
-    }
+      this._loading = true;
 
-    if (reset || !this._dataProvider) {
-      this.setupDataProvider();
-    }
-
-    this._loading = true;
-
-    return this._dataProvider
-      .getPage(this._state, this._requestParameters())
-      .then(page => {
-        this._selectedItems = [];
-        this._loading = false;
-        this.setPageData(page);
-        this.onStateChanged();
-        return page;
-      }, error => {
-        this._selectedItems = [];
-        this._loading = false;
-        this.setPageData({
-          totalElements: 0,
-          content: []
+      return this._dataProvider
+        .getPage(this._state, this._requestParameters())
+        .then(page => {
+          this._selectedItems = [];
+          this._loading = false;
+          this.setPageData(page);
+          this.element.dispatchEvent(new Event(AtomicGridController.AFTER_SEARCH_EVENT));
+          return page;
+        }, error => {
+          this._selectedItems = [];
+          this._loading = false;
+          this.setPageData({
+            totalElements: 0,
+            content: []
+          });
+          this.element.dispatchEvent(new Event(AtomicGridController.AFTER_SEARCH_EVENT));
+          return error;
         });
-        this.onStateChanged();
-        return error;
-      });
+    }, AtomicGridController.BEFORE_SEARCH_EVENT) || Promise.reject(undefined);
   }
-
-  canChangeState(): Promise<void> {
-    return this.canChangeSelection();
-  }
-
-  abstract canChangeSelection(): Promise<void>
 
   get isPrevEnabled() {
     return !this.loading && this.page > 1;
@@ -110,11 +142,11 @@ export abstract class AtomicGridController<T> {
   }
 
   set size(newPageSize: number) {
-    this.canChangeState().then(() => {
+    this.dispatchBeforeEvent(() => {
       this._state.page = 0;
       this._state.size = parseInt(<any>newPageSize);
       this.search();
-    }, () => {});
+    }, AtomicGridController.BEFORE_CHANGE_STATE, AtomicGridController.BEFORE_CHANGE_SELECTION);
   }
 
   setSize(newPageSize: number) {
@@ -126,10 +158,10 @@ export abstract class AtomicGridController<T> {
   }
 
   set page(newPageNumber: number) {
-    this.canChangeState().then(() => {
+    this.dispatchBeforeEvent(() => {
       this._state.page = newPageNumber - 1;
       this.search();
-    }, () => {});
+    }, AtomicGridController.BEFORE_CHANGE_STATE, AtomicGridController.BEFORE_CHANGE_SELECTION);
   }
 
   setPage(newPageNumber: number) {
@@ -234,7 +266,7 @@ export abstract class AtomicGridController<T> {
   }
 
   sort(sortBy: string|Function, append?: boolean) {
-    this.canChangeState().then(() => {
+    this.dispatchBeforeEvent(() => {
       let sort = this.getSortBy(sortBy);
       let reverse;
       if (sort === undefined) {
@@ -245,7 +277,7 @@ export abstract class AtomicGridController<T> {
 
       this.setSort(sortBy, reverse, append);
       this.search();
-    }, () => {});
+    }, AtomicGridController.BEFORE_CHANGE_STATE, AtomicGridController.BEFORE_CHANGE_SELECTION);
   }
 
   getSortBy(sortBy: string|Function): AtomicGridSort {
@@ -291,7 +323,7 @@ export abstract class AtomicGridController<T> {
   }
 
   selectItem(selected: boolean, item?: T) {
-    this.canChangeSelection().then(() => {
+    this.dispatchBeforeEvent(() => {
       if (item) {
         if (selected) {
           if (this._selectedItems.filter(i => i === item).length == 0) {
@@ -315,8 +347,7 @@ export abstract class AtomicGridController<T> {
           this._selectedItems = [];
         }
       }
-      this.onStateChanged();
-    }, () => {});
+    }, AtomicGridController.BEFORE_CHANGE_SELECTION);
   }
 
   toggleItemSelection(item?: T) {

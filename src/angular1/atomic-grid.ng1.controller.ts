@@ -4,7 +4,7 @@ import { AtomicGridNg1SpringDataProvider } from './atomic-grid.ng1.spring-data-p
 
 export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
 
-  static $inject = [ '$q', '$attrs', '$http', '$scope', '$parse' ];
+  static $inject = [ '$q', '$attrs', '$http', '$scope', '$parse', '$element' ];
 
   private name: string;
 
@@ -13,8 +13,6 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
   private dataProvider;
 
   private additionalParameters;
-  private canChangeStateFn: Function;
-  private canChangeSelectionFn: Function;
 
   private autoSearch;
 
@@ -22,8 +20,9 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
               private $attrs: ng.IAttributes,
               private $http: ng.IHttpService,
               private $scope: ng.IScope,
-              private $parse: ng.IParseService) {
-    super();
+              private $parse: ng.IParseService,
+              $element: ng.IAugmentedJQuery) {
+    super($element[0]);
   }
 
   $onInit() {
@@ -42,6 +41,10 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
   }
 
   $postLink() {
+    this.addEventListener(AtomicGridController.AFTER_SEARCH_EVENT, () => {
+      this.$scope.$applyAsync();
+    });
+
     if (this.autoSearch) {
       this.search(true);
     }
@@ -78,30 +81,6 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
     }
 
     this.setDataProvider(new AtomicGridNg1InMemoryDataProvider(this.data || []));
-  }
-
-  canChangeState() {
-    return super.canChangeState()
-      .then(() => this.canChangeStateFn({}))
-      .then(value => {
-        if (value !== undefined && value !== true) {
-          return Promise.reject(value);
-        }
-      });
-  }
-
-  canChangeSelection() {
-    return Promise.resolve(this.canChangeSelectionFn({}))
-      .then(value => {
-        if (value !== undefined && value !== true) {
-          return Promise.reject(value);
-        }
-      });
-  }
-
-  onStateChanged() {
-    super.onStateChanged();
-    this.$scope.$applyAsync();
   }
 
 }

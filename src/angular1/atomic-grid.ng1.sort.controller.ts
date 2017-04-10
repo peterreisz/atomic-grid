@@ -33,17 +33,20 @@ export class AtomicGridNg1SortController<T> {
       if (this.oldSortBy === undefined) {
         this.$element.removeClass('sort-asc');
         this.$element.removeClass('sort-desc');
+      } else {
+
+        if (this.oldSortBy.reverse === true) {
+          this.$element.addClass('sort-asc');
+          this.$element.removeClass('sort-desc');
+        }
+
+        if (this.oldSortBy.reverse === false) {
+          this.$element.removeClass('sort-asc');
+          this.$element.addClass('sort-desc');
+        }
+
       }
 
-      if (this.oldSortBy.reverse === true) {
-        this.$element.addClass('sort-asc');
-        this.$element.removeClass('sort-desc');
-      }
-
-      if (this.oldSortBy.reverse === false) {
-        this.$element.removeClass('sort-asc');
-        this.$element.addClass('sort-desc');
-      }
     }
   }
 

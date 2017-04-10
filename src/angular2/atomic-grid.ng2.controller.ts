@@ -1,4 +1,4 @@
-import { Directive, Input, OnInit, Inject } from '@angular/core';
+import { Directive, Input, OnInit, Inject, ElementRef } from '@angular/core';
 import { Http } from '@angular/http';
 import { AtomicGridController } from '../core/atomic-grid.controller';
 import { AtomicGridNg2InMemoryDataProvider } from './atomic-grid.ng2.inmemory-data-provider.class';
@@ -17,8 +17,9 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
   @Input('atGridAdditionalParameters') additionalParameters;
   @Input('atGridAutoSearch') autoSearch: boolean = true;
 
-  constructor(@Inject(Http) private http: Http) {
-    super();
+  constructor(@Inject(Http) private http: Http,
+              @Inject(ElementRef) elementRef: ElementRef) {
+    super(elementRef.nativeElement);
   }
 
   ngOnInit() {

@@ -33,9 +33,7 @@ function AtomicGridNg1ModuleFactory(angular: ng.IAngularStatic) {
           additionalParameters: '&atGridAdditionalParameters',
           multiSelection: '<atGridMultiSelection',
           pagerRange: '<atGridPagerRange',
-          autoSearch: '<atGridAutoSearch',
-          canChangeStateFn: '&atGridCanChangeState',
-          canChangeSelectionFn: '&atGridCanChangeSelection',
+          autoSearch: '<atGridAutoSearch'
         },
         controller: AtomicGridNg1Controller,
         controllerAs: '$atGrid'
