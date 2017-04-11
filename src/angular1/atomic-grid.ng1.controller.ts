@@ -41,7 +41,11 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
   }
 
   $postLink() {
-    this.addEventListener(AtomicGridController.AFTER_SEARCH_EVENT, () => {
+    this.onAfterSearch(() => {
+      this.$scope.$applyAsync();
+    });
+
+    this.onAfterChangeSelection(() => {
       this.$scope.$applyAsync();
     });
 

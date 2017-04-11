@@ -3,10 +3,11 @@ import { AtomicGridSpringDataProvider } from './atomic-grid-spring-data-provider
 
 export abstract class AtomicGridController<T> {
 
-  public static BEFORE_SEARCH_EVENT = 'before-search';
-  public static AFTER_SEARCH_EVENT = 'after-search';
-  public static BEFORE_CHANGE_STATE = 'before-change-state';
-  public static BEFORE_CHANGE_SELECTION = 'before-change-selection';
+  protected static BEFORE_SEARCH_EVENT = 'before-search';
+  protected static AFTER_SEARCH_EVENT = 'after-search';
+  protected static BEFORE_CHANGE_STATE = 'before-change-state';
+  protected static BEFORE_CHANGE_SELECTION = 'before-change-selection';
+  protected static AFTER_CHANGE_SELECTION = 'after-change-selection';
 
   public pageSizes = [10, 20, 50, 100];
 
@@ -32,16 +33,23 @@ export abstract class AtomicGridController<T> {
   }
 
   protected dispatchBeforeEvent(doHandler: Function, ...types: string[]) {
-    let events = types.map(type => new CustomEvent(type, {
-      cancelable: true,
-      detail: {
+    let events = types.map(type => {
+      let event = document.createEvent('CustomEvent');
+      event.initCustomEvent(type, false, true, {
         do: doHandler
-      }
-    }));
+      });
+      return event;
+    });
 
     if (events.every(event => this.element.dispatchEvent(event))) {
       return doHandler();
     }
+  }
+
+  protected dispatchAfterEvent(type: string) {
+    let event = document.createEvent('Event');
+    event.initEvent(type, false, false);
+    this.element.dispatchEvent(event);
   }
 
   onBeforeSearch(listener: EventListenerOrEventListenerObject) {
@@ -58,6 +66,10 @@ export abstract class AtomicGridController<T> {
 
   onBeforeChangeSelection(listener: EventListenerOrEventListenerObject) {
     return this.addEventListener(AtomicGridController.BEFORE_CHANGE_SELECTION, listener);
+  }
+
+  onAfterChangeSelection(listener: EventListenerOrEventListenerObject) {
+    return this.addEventListener(AtomicGridController.AFTER_CHANGE_SELECTION, listener);
   }
 
   resetState() {
@@ -88,42 +100,49 @@ export abstract class AtomicGridController<T> {
 
   setPageData(page: AtomicGridPage<T>) {
     this._page = page;
-    this.reCalculatePager()
+    this.reCalculatePager();
   }
 
   abstract setupDataProvider();
 
-  search(reset?: boolean): Promise<void> {
-    return this.dispatchBeforeEvent(() => {
-      if (reset) {
-        this.resetState();
-      }
+  search(reset?: boolean): Promise<AtomicGridPage<T>> {
+    return new Promise((resolve, reject) => {
+      let result = this.dispatchBeforeEvent(() => {
+        if (reset) {
+          this.resetState();
+        }
 
-      if (reset || !this._dataProvider) {
-        this.setupDataProvider();
-      }
+        if (reset || !this._dataProvider) {
+          this.setupDataProvider();
+        }
 
-      this._loading = true;
+        this._loading = true;
 
-      return this._dataProvider
-        .getPage(this._state, this._requestParameters())
-        .then(page => {
-          this._selectedItems = [];
-          this._loading = false;
-          this.setPageData(page);
-          this.element.dispatchEvent(new Event(AtomicGridController.AFTER_SEARCH_EVENT));
-          return page;
-        }, error => {
-          this._selectedItems = [];
-          this._loading = false;
-          this.setPageData({
-            totalElements: 0,
-            content: []
+        this._dataProvider
+          .getPage(this._state, this._requestParameters())
+          .then(page => {
+            this.handleAfterSearch(page);
+            resolve(page);
+          }, error => {
+            this.handleAfterSearch();
+            reject();
           });
-          this.element.dispatchEvent(new Event(AtomicGridController.AFTER_SEARCH_EVENT));
-          return error;
-        });
-    }, AtomicGridController.BEFORE_SEARCH_EVENT) || Promise.reject(undefined);
+        return true;
+      });
+      if (!result) {
+        reject();
+      }
+    });
+  }
+
+  private handleAfterSearch(page?: AtomicGridPage<T>): void {
+    this._selectedItems = [];
+    this._loading = false;
+    this.setPageData(page || {
+      totalElements: 0,
+      content: []
+    });
+    this.dispatchAfterEvent(AtomicGridController.AFTER_SEARCH_EVENT);
   }
 
   get isPrevEnabled() {
@@ -322,32 +341,38 @@ export abstract class AtomicGridController<T> {
     }
   }
 
-  selectItem(selected: boolean, item?: T) {
-    this.dispatchBeforeEvent(() => {
-      if (item) {
-        if (selected) {
-          if (this._selectedItems.filter(i => i === item).length == 0) {
-            if (this._multiSelection) {
-              this._selectedItems.push(item);
-            } else {
-              this._selectedItems = [ item ];
+  selectItem(selected: boolean, item?: T): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let result = this.dispatchBeforeEvent(() => {
+        if (item) {
+          if (selected) {
+            if (this._selectedItems.filter(i => i === item).length == 0) {
+              if (this._multiSelection) {
+                this._selectedItems.push(item);
+              } else {
+                this._selectedItems = [ item ];
+              }
             }
-          }
-        } else {
-          this._selectedItems = this._selectedItems.filter(i => i !== item);
-        }
-      } else {
-        if (selected) {
-          if (this._multiSelection) {
-            this._selectedItems = this._page.content.concat();
           } else {
-            this._selectedItems = [ this._page.content[0] ];
+            this._selectedItems = this._selectedItems.filter(i => i !== item);
           }
         } else {
-          this._selectedItems = [];
+          if (selected) {
+            if (this._multiSelection) {
+              this._selectedItems = this._page.content.concat();
+            } else {
+              this._selectedItems = [ this._page.content[0] ];
+            }
+          } else {
+            this._selectedItems = [];
+          }
         }
-      }
-    }, AtomicGridController.BEFORE_CHANGE_SELECTION);
+        this.dispatchAfterEvent(AtomicGridController.AFTER_CHANGE_SELECTION);
+        return true;
+      }, AtomicGridController.BEFORE_CHANGE_SELECTION);
+
+      resolve(result);
+    });
   }
 
   toggleItemSelection(item?: T) {
