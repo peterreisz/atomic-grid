@@ -34,10 +34,21 @@ export abstract class AtomicGridInMemoryDataProvider<T> implements AtomicGridDat
     };
   }
 
+  // https://stackoverflow.com/a/6491621
   private getProperty(property: string) {
     return (item: T) => {
-      // TODO: deep get
-      return item[property];
+      property = property.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+      property = property.replace(/^\./, '');           // strip a leading dot
+      var parts = property.split('.');
+      for (var i = 0, n = parts.length; i < n; ++i) {
+        var part = parts[i];
+        if (part in item) {
+          item = item[part];
+        } else {
+          return;
+        }
+      }
+      return item;
     }
   }
 
