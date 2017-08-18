@@ -1,4 +1,4 @@
-import { Directive, Input, OnInit, Inject, ElementRef } from '@angular/core';
+import { Directive, Input, OnInit, Inject, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 import { Http } from '@angular/http';
 import { AtomicGridController } from '../core/atomic-grid.controller';
 import { AtomicGridNg2InMemoryDataProvider } from './atomic-grid.ng2.inmemory-data-provider.class';
@@ -9,7 +9,7 @@ import { AtomicGridDataProvider } from '../core/atomic-grid.types';
   selector: '[atGridData],[atGridUrl]',
   exportAs: 'atGrid'
 })
-export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implements OnInit {
+export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implements OnInit, OnChanges {
 
   @Input('atGridData') data: Array<T>;
   @Input('atGridUrl') url: string;
@@ -26,6 +26,19 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
     this.setRequestParameterProvider(() => this.additionalParameters);
     if (this.autoSearch) {
       this.search(true);
+    }
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this._dataProvider && (
+        changes.data && changes.data.currentValue
+        || changes.url && changes.url.currentValue
+      )) {
+      if (this.autoSearch) {
+        this.search(true);
+      } else {
+        this.setupDataProvider();
+      }
     }
   }
 
@@ -49,16 +62,6 @@ export class AtomicGridNg2Controller<T> extends AtomicGridController<T> implemen
     this.setDataProvider(
       new AtomicGridNg2InMemoryDataProvider(this.data || [])
     );
-  }
-
-  canChangeState() {
-    // TODO
-    return Promise.resolve()
-  }
-
-  canChangeSelection() {
-    // TODO
-    return Promise.resolve()
   }
 
 }

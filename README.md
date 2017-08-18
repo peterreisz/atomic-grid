@@ -131,9 +131,9 @@ Controller method / property | Description
 ### Sorting
 Controller method / property | Description
 --- | ---
-`setSort(sortBy: string|Function, reverse: boolean, append?: boolean): void` | Change the grid sorting without doing a search.
-`sort(sortBy: string|Function, append?: boolean)` | Change the grid sorting and refresh it's content
-`getSortBy(sortBy: string|Function): AtomicGridSort` | Is the grid sort by the given field
+`setSort(sortBy: string&#124;Function, reverse: boolean, append?: boolean): void` | Change the grid sorting without doing a search.
+`sort(sortBy: string&#124;Function, append?: boolean)` | Change the grid sorting and refresh it's content
+`getSortBy(sortBy: string&#124;Function): AtomicGridSort` | Is the grid sort by the given field
 
 ### Paging
 Controller method / property | Description

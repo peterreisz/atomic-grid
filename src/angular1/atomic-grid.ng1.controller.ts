@@ -55,8 +55,15 @@ export class AtomicGridNg1Controller<T> extends AtomicGridController<T> {
   }
 
   $onChanges(change) {
-    if (this._dataProvider && change.data && change.data.currentValue) {
-      this.search(true);
+    if (this._dataProvider && (
+        change.data && change.data.currentValue
+        || change.url && change.url.currentValue
+      )) {
+      if (this.autoSearch) {
+        this.search(true);
+      } else {
+        this.setupDataProvider();
+      }
     }
   }
 
