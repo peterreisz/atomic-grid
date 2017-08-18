@@ -128,7 +128,7 @@ export abstract class AtomicGridController<T> {
             reject();
           });
         return true;
-      });
+      }, AtomicGridController.BEFORE_SEARCH_EVENT);
       if (!result) {
         reject();
       }
