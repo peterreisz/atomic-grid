@@ -149,7 +149,7 @@ Controller method / property | Description
 --- | ---
 `multiSelection: boolean` | Getter/setter for is the multiselection enabled for the grid
 <code>selectedItem: undefined &#124; T</code> | Get the selected item if multiselection is disabled
-<code>selectedItem: undefined &#124; Array<T></code> | Get the selected items if multiselection is enabled
+<code>selectedItems: undefined &#124; Array<T></code> | Get the selected items if multiselection is enabled
 
 ### Events
 Controller method / property | Description
